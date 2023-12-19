@@ -1,0 +1,63 @@
+name: Trigger Update From Template
+
+on:
+  workflow_call:
+    inputs:
+      workflow:
+        type: string
+        description: |
+          The workflow file to trigger a workflow dispatch on. Defaults to "update-from-template.yml"
+        required: false
+        default: update-from-template.yml
+    secrets:
+      github-pat:
+        description: |
+          The personal access token used to authenticate for certain operations that cannot be achieved
+          with the GitHub Token.
+        required: true
+
+permissions:
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # TODO: check what event called us. Should be pull_request closed. Can be done in a different job.
+  list-template-instances:
+    if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
+    runs-on: ubuntu-22.04
+    outputs:
+      # TODO: this only works because there is one label. We will need to address
+      # https://github.com/infrastructure-blocks/check-labels-action/issues/16 to have more labels.
+      labels: '["${{ steps.check-labels.outputs.matched-labels }}"]'
+      instances: ${{ steps.list-template-instances.outputs.instances }}
+    steps:
+      # Check the PR label and keep it for later.
+      - name: Get PR label for propagation
+        id: check-labels
+        uses: infrastructure-blocks/check-labels-action@v1
+        with:
+          one-of: no version, patch, minor, major
+      # List repository instances
+      - name: List repositories instantiating this template
+        id: list-template-instances
+        uses: infrastructure-blocks/list-template-repository-instances-action@v1
+        with:
+          github-token: ${{ secrets.github-pat }}
+  # For each repository instance, trigger workflow and pass the label. Use matrix?
+  trigger-update-from-template:
+      if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
+      needs:
+        - list-template-instances
+      runs-on: ubuntu-22.04
+      strategy:
+        fail-fast: false
+        matrix:
+          repository: ${{ (fromJson(needs.list-template-instances.outputs.instances)).*.full_name }}
+      steps:
+        - name: Trigger workflow dispatch for ${{ matrix.repository }}
+          run: |
+            # TODO: get label from previous steps.
+            GH_TOKEN=${{ secrets.github-pat }} gh workflow run --repo ${{ matrix.repository }} --field labels='${{ needs.list-template-instances.outputs.labels }}' ${{ inputs.workflow }}
