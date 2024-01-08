@@ -24,7 +24,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # TODO: check what event called us. Should be pull_request closed. Can be done in a different job.
+  # TODO: Get the pull request object when not being called from a pull request event.
   list-template-instances:
     if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
     runs-on: ubuntu-22.04
@@ -33,6 +33,7 @@ jobs:
       # https://github.com/infrastructure-blocks/check-labels-action/issues/16 to have more labels.
       labels: '["${{ steps.check-labels.outputs.matched-labels }}"]'
       instances: ${{ steps.list-template-instances.outputs.instances }}
+      instances-length: ${{ steps.list-template-instances.outputs.instances-length }}
     steps:
       # Check the PR label and keep it for later.
       - name: Get PR label for propagation
@@ -48,7 +49,7 @@ jobs:
           github-token: ${{ secrets.github-pat }}
   # For each repository instance, trigger workflow and pass the label. Use matrix?
   trigger-update-from-template:
-      if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
+      if: ${{ github.event.action == 'closed' && github.event.pull_request.merged && fromJson(needs.list-template-instances.outputs.instances-length) > 0 }}
       needs:
         - list-template-instances
       runs-on: ubuntu-22.04
