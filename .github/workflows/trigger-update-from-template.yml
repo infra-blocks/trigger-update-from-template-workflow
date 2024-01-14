@@ -6,7 +6,7 @@ on:
       workflow:
         type: string
         description: |
-          The workflow file to trigger a workflow dispatch on. Defaults to "update-from-template.yml"
+          The workflow file being trigger with a workflow dispatch event. Defaults to "update-from-template.yml".
         required: false
         default: update-from-template.yml
     secrets:
@@ -36,6 +36,7 @@ jobs:
       instances-length: ${{ steps.list-template-instances.outputs.instances-length }}
     steps:
       # Check the PR label and keep it for later.
+      # TODO: use check-labels-action v2
       - name: Get PR label for propagation
         id: check-labels
         uses: infrastructure-blocks/check-labels-action@v1
@@ -47,7 +48,7 @@ jobs:
         uses: infrastructure-blocks/list-template-repository-instances-action@v1
         with:
           github-token: ${{ secrets.github-pat }}
-  # For each repository instance, trigger workflow and pass the label. Use matrix?
+  # For each repository instance, trigger workflow and pass the label.
   trigger-update-from-template:
       if: ${{ github.event.action == 'closed' && github.event.pull_request.merged && fromJson(needs.list-template-instances.outputs.instances-length) > 0 }}
       needs:
@@ -60,5 +61,4 @@ jobs:
       steps:
         - name: Trigger workflow dispatch for ${{ matrix.repository }}
           run: |
-            # TODO: get label from previous steps.
             GH_TOKEN=${{ secrets.github-pat }} gh workflow run --repo ${{ matrix.repository }} --field labels='${{ needs.list-template-instances.outputs.labels }}' ${{ inputs.workflow }}
