@@ -25,23 +25,19 @@ concurrency:
 
 jobs:
   # TODO: Get the pull request object when not being called from a pull request event.
+  check-has-semver-label:
+    if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
+    permissions:
+      pull-requests: write
+    uses: infrastructure-blocks/check-has-semver-label-workflow/.github/workflows/check-has-semver-label.yml@v1
+  # TODO: workflow.
   list-template-instances:
     if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
     runs-on: ubuntu-22.04
     outputs:
-      # TODO: this only works because there is one label. We will need to address
-      # https://github.com/infrastructure-blocks/check-labels-action/issues/16 to have more labels.
-      labels: '["${{ steps.check-labels.outputs.matched-labels }}"]'
       instances: ${{ steps.list-template-instances.outputs.instances }}
       instances-length: ${{ steps.list-template-instances.outputs.instances-length }}
     steps:
-      # Check the PR label and keep it for later.
-      # TODO: use check-labels-action v2
-      - name: Get PR label for propagation
-        id: check-labels
-        uses: infrastructure-blocks/check-labels-action@v1
-        with:
-          one-of: no version, patch, minor, major
       # List repository instances
       - name: List repositories instantiating this template
         id: list-template-instances
@@ -50,15 +46,16 @@ jobs:
           github-token: ${{ secrets.github-pat }}
   # For each repository instance, trigger workflow and pass the label.
   trigger-update-from-template:
-      if: ${{ github.event.action == 'closed' && github.event.pull_request.merged && fromJson(needs.list-template-instances.outputs.instances-length) > 0 }}
-      needs:
-        - list-template-instances
-      runs-on: ubuntu-22.04
-      strategy:
-        fail-fast: false
-        matrix:
-          repository: ${{ (fromJson(needs.list-template-instances.outputs.instances)).*.full_name }}
-      steps:
-        - name: Trigger workflow dispatch for ${{ matrix.repository }}
-          run: |
-            GH_TOKEN=${{ secrets.github-pat }} gh workflow run --repo ${{ matrix.repository }} --field labels='${{ needs.list-template-instances.outputs.labels }}' ${{ inputs.workflow }}
+    needs:
+      - check-has-semver-label
+      - list-template-instances
+    if: ${{ fromJson(needs.list-template-instances.outputs.instances-length) > 0 }}
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        repository: ${{ (fromJson(needs.list-template-instances.outputs.instances)).*.full_name }}
+    steps:
+      - name: Trigger workflow dispatch for ${{ matrix.repository }}
+        run: |
+          GH_TOKEN=${{ secrets.github-pat }} gh workflow run --repo ${{ matrix.repository }} --field labels='["${{ needs.check-has-semver-label.outputs.matched-label }}"]' ${{ inputs.workflow }}
