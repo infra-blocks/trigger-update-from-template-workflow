@@ -22,9 +22,9 @@ N/A
 
 ## Permissions
 
-|     Scope     | Level | Reason                            |
-|:-------------:|:-----:|-----------------------------------|
-| pull-requests | read  | To read the triggering PR labels. |
+|     Scope     | Level | Reason                                 |
+|:-------------:|:-----:|----------------------------------------|
+| pull-requests | write | To post status reports as PR comments. |
 
 ## Concurrency controls
 
