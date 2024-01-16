@@ -47,7 +47,7 @@ on:
       - closed
 
 permissions:
-  pull-requests: read
+  pull-requests: write
 
 jobs:
   trigger-update-from-template:
