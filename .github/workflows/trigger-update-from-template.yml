@@ -36,20 +36,20 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       instances: ${{ steps.list-template-instances.outputs.instances }}
-      instances-length: ${{ steps.list-template-instances.outputs.instances-length }}
+      instances-count: ${{ steps.list-template-instances.outputs.instances-count }}
     steps:
       # List repository instances
       - name: List repositories instantiating this template
         id: list-template-instances
-        uses: infrastructure-blocks/list-template-repository-instances-action@v1
+        uses: docker://public.ecr.aws/infrastructure-blocks/list-template-repository-instances-action:v2
         with:
-          github-token: ${{ secrets.github-pat }}
+          github-pat: ${{ secrets.github-pat }}
   # For each repository instance, trigger workflow and pass the label.
   trigger-update-from-template:
     needs:
       - check-has-semver-label
       - list-template-instances
-    if: ${{ fromJson(needs.list-template-instances.outputs.instances-length) > 0 }}
+    if: ${{ fromJson(needs.list-template-instances.outputs.instances-count) > 0 }}
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
