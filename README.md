@@ -33,6 +33,10 @@ N/A
 |       group        | ${{ github.workflow }}-${{ github.ref }} |
 | cancel-in-progress |                   true                   | 
 
+## Timeouts
+
+N/A
+
 ## Usage
 
 ```yaml
@@ -51,7 +55,7 @@ permissions:
 
 jobs:
   trigger-update-from-template:
-    uses: infrastructure-blocks/trigger-update-from-template-workflow/.github/workflows/trigger-update-from-template.yml@v1
+    uses: infrastructure-blocks/trigger-update-from-template-workflow/.github/workflows/workflow.yml@v1
     secrets:
       github-pat: ${{ secrets.PAT }}
 ```

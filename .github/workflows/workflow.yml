@@ -1,0 +1,61 @@
+name: Trigger Update From Template
+
+on:
+  workflow_call:
+    inputs:
+      workflow:
+        type: string
+        description: |
+          The workflow file being trigger with a workflow dispatch event. Defaults to "update-from-template.yml".
+        required: false
+        default: update-from-template.yml
+    secrets:
+      github-pat:
+        description: |
+          The personal access token used to authenticate for certain operations that cannot be achieved
+          with the GitHub Token.
+        required: true
+
+permissions:
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # TODO: Get the pull request object when not being called from a pull request event.
+  check-has-semver-label:
+    if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
+    permissions:
+      pull-requests: write
+    uses: infrastructure-blocks/check-has-semver-label-workflow/.github/workflows/check-has-semver-label.yml@v1
+  # TODO: workflow.
+  list-template-instances:
+    if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
+    runs-on: ubuntu-22.04
+    outputs:
+      instances: ${{ steps.list-template-instances.outputs.instances }}
+      instances-count: ${{ steps.list-template-instances.outputs.instances-count }}
+    steps:
+      # List repository instances
+      - name: List repositories instantiating this template
+        id: list-template-instances
+        uses: docker://public.ecr.aws/infrastructure-blocks/list-template-repository-instances-action:v2
+        with:
+          github-pat: ${{ secrets.github-pat }}
+  # For each repository instance, trigger workflow and pass the label.
+  trigger-update-from-template:
+    needs:
+      - check-has-semver-label
+      - list-template-instances
+    if: ${{ fromJson(needs.list-template-instances.outputs.instances-count) > 0 }}
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        repository: ${{ (fromJson(needs.list-template-instances.outputs.instances)).*.full_name }}
+    steps:
+      - name: Trigger workflow dispatch for ${{ matrix.repository }}
+        run: |
+          GH_TOKEN=${{ secrets.github-pat }} gh workflow run --repo ${{ matrix.repository }} --field labels='["${{ needs.check-has-semver-label.outputs.matched-label }}"]' ${{ inputs.workflow }}
