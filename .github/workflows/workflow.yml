@@ -29,7 +29,7 @@ jobs:
     if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
     permissions:
       pull-requests: write
-    uses: infrastructure-blocks/check-has-semver-label-workflow/.github/workflows/check-has-semver-label.yml@v1
+    uses: infrastructure-blocks/check-has-semver-label-workflow/.github/workflows/workflow.yml@v1
   # TODO: workflow.
   list-template-instances:
     if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
