@@ -3,6 +3,11 @@ name: Trigger Update From Template
 on:
   workflow_call:
     inputs:
+      skip:
+        type: boolean
+        description: Whether to skip the workflow or not.
+        required: false
+        default: false
       workflow:
         type: string
         description: |
@@ -24,15 +29,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # TODO: Get the pull request object when not being called from a pull request event.
   check-has-semver-label:
-    if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
     permissions:
       pull-requests: write
     uses: infrastructure-blocks/check-has-semver-label-workflow/.github/workflows/workflow.yml@v1
+    with:
+      skip: ${{ inputs.skip || github.event.action != 'closed' || !github.event.pull_request.merged }}
   # TODO: workflow.
   list-template-instances:
-    if: ${{ github.event.action == 'closed' && github.event.pull_request.merged }}
+    if: ${{ !inputs.skip && github.event.action == 'closed' && github.event.pull_request.merged }}
     runs-on: ubuntu-22.04
     outputs:
       instances: ${{ steps.list-template-instances.outputs.instances }}
@@ -49,7 +54,7 @@ jobs:
     needs:
       - check-has-semver-label
       - list-template-instances
-    if: ${{ fromJson(needs.list-template-instances.outputs.instances-count) > 0 }}
+    if: ${{ !inputs.skip && fromJson(needs.list-template-instances.outputs.instances-count) > 0 }}
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false

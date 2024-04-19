@@ -8,9 +8,11 @@ on all repositories of the same organization that instantiate the template (call
 
 ## Inputs
 
-|   Name   | Required | Description                                                                                             |
-|:--------:|:--------:|---------------------------------------------------------------------------------------------------------|
-| workflow |  false   | The workflow file being trigger with a workflow dispatch event. Defaults to "update-from-template.yml". |
+|   Name   | Required | Description                                                                                                                                                                  |
+|:--------:|:--------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|   skip   |  false   | A boolean indicating whether to skip the workflow. This is to workaround the required checks discrepancy when the workflow is skipped from the caller. It defaults to false. |
+| workflow |  false   | The workflow file being trigger with a workflow dispatch event. Defaults to "update-from-template.yml".                                                                      |
+
 
 ## Secrets
 
