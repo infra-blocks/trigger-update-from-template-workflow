@@ -32,7 +32,7 @@ jobs:
   check-has-semver-label:
     permissions:
       pull-requests: write
-    uses: infrastructure-blocks/check-has-semver-label-workflow/.github/workflows/workflow.yml@v1
+    uses: infrastructure-blocks/check-has-semver-label-workflow/.github/workflows/workflow.yml@v2
     with:
       skip: ${{ inputs.skip || github.event.action != 'closed' || !github.event.pull_request.merged }}
   # TODO: workflow.
