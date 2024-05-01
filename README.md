@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 # trigger-update-from-template-workflow
 [![Git Tag Semver From Label](https://github.com/infrastructure-blocks/trigger-update-from-template-workflow/actions/workflows/git-tag-semver-from-label.yml/badge.svg)](https://github.com/infrastructure-blocks/trigger-update-from-template-workflow/actions/workflows/git-tag-semver-from-label.yml)
 [![Update From Template](https://github.com/infrastructure-blocks/trigger-update-from-template-workflow/actions/workflows/update-from-template.yml/badge.svg)](https://github.com/infrastructure-blocks/trigger-update-from-template-workflow/actions/workflows/update-from-template.yml)
+=======
+# github-actions-workflow-template
+[![Release](https://github.com/infrastructure-blocks/github-actions-workflow-template/actions/workflows/release.yml/badge.svg)](https://github.com/infrastructure-blocks/github-actions-workflow-template/actions/workflows/release.yml)
+[![Trigger Update From Template](https://github.com/infrastructure-blocks/github-actions-workflow-template/actions/workflows/trigger-update-from-template.yml/badge.svg)](https://github.com/infrastructure-blocks/github-actions-workflow-template/actions/workflows/trigger-update-from-template.yml)
+>>>>>>> template/master
 
 Reusable workflow to use on a template repository to trigger the
 [merge-template-workflow](https://github.com/infrastructure-blocks/merge-template-workflow)
