@@ -20,7 +20,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the caller's side (with an `if` expression), the check path when the workflow was run is not the same as when
   it was skipped ( `outer / inner` vs. `outer` when skipped) !
 
-
 ## [2.0.0] - 2024-01-19
 
 ### Removed
