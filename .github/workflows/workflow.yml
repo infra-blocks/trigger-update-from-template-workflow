@@ -29,6 +29,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+<<<<<<< HEAD
   check-has-semver-label:
     permissions:
       pull-requests: write
@@ -38,11 +39,15 @@ jobs:
   # TODO: workflow.
   list-template-instances:
     if: ${{ !inputs.skip && github.event.action == 'closed' && github.event.pull_request.merged }}
+=======
+  example-job:
+>>>>>>> template/master
     runs-on: ubuntu-22.04
     outputs:
       instances: ${{ steps.list-template-instances.outputs.instances }}
       instances-count: ${{ steps.list-template-instances.outputs.instances-count }}
     steps:
+<<<<<<< HEAD
       # List repository instances
       - name: List repositories instantiating this template
         id: list-template-instances
@@ -62,5 +67,13 @@ jobs:
         repository: ${{ (fromJson(needs.list-template-instances.outputs.instances)).*.full_name }}
     steps:
       - name: Trigger workflow dispatch for ${{ matrix.repository }}
+=======
+      # This condition should be on every step.
+      - if: ${{ !inputs.skip }}
+        id: example-step
+        name: Example step
+        env:
+          BIG_SECRET: ${{ secrets.example-secret }}
+>>>>>>> template/master
         run: |
           GH_TOKEN=${{ secrets.github-pat }} gh workflow run --repo ${{ matrix.repository }} --field labels='["${{ needs.check-has-semver-label.outputs.matched-label }}"]' ${{ inputs.workflow }}
