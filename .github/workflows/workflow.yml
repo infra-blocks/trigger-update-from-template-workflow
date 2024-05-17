@@ -32,7 +32,7 @@ jobs:
   check-has-semver-label:
     permissions:
       pull-requests: write
-    uses: infrastructure-blocks/check-has-semver-label-workflow/.github/workflows/workflow.yml@v2
+    uses: infra-blocks/check-has-semver-label-workflow/.github/workflows/workflow.yml@v2
     with:
       skip: ${{ inputs.skip || github.event.action != 'closed' || !github.event.pull_request.merged }}
   # TODO: workflow.
@@ -46,7 +46,7 @@ jobs:
       # List repository instances
       - name: List repositories instantiating this template
         id: list-template-instances
-        uses: docker://public.ecr.aws/infrastructure-blocks/list-template-repository-instances-action:v2
+        uses: docker://public.ecr.aws/infra-blocks/list-template-repository-instances-action:v2
         with:
           github-pat: ${{ secrets.github-pat }}
   # For each repository instance, trigger workflow and pass the label.
