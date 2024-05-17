@@ -1,9 +1,9 @@
 # trigger-update-from-template-workflow
-[![Release](https://github.com/infrastructure-blocks/trigger-update-from-template-workflow/actions/workflows/release.yml/badge.svg)](https://github.com/infrastructure-blocks/trigger-update-from-template-workflow/actions/workflows/release.yml)
-[![Update From Template](https://github.com/infrastructure-blocks/trigger-update-from-template-workflow/actions/workflows/update-from-template.yml/badge.svg)](https://github.com/infrastructure-blocks/trigger-update-from-template-workflow/actions/workflows/update-from-template.yml)
+[![Release](https://github.com/infra-blocks/trigger-update-from-template-workflow/actions/workflows/release.yml/badge.svg)](https://github.com/infra-blocks/trigger-update-from-template-workflow/actions/workflows/release.yml)
+[![Update From Template](https://github.com/infra-blocks/trigger-update-from-template-workflow/actions/workflows/update-from-template.yml/badge.svg)](https://github.com/infra-blocks/trigger-update-from-template-workflow/actions/workflows/update-from-template.yml)
 
 Reusable workflow to use on a template repository to trigger the
-[merge-template-workflow](https://github.com/infrastructure-blocks/merge-template-workflow)
+[merge-template-workflow](https://github.com/infra-blocks/merge-template-workflow)
 on all repositories of the same organization that instantiate the template (calling this workflow).
 
 ## Inputs
@@ -59,7 +59,7 @@ permissions:
 
 jobs:
   trigger-update-from-template:
-    uses: infrastructure-blocks/trigger-update-from-template-workflow/.github/workflows/workflow.yml@v1
+    uses: infra-blocks/trigger-update-from-template-workflow/.github/workflows/workflow.yml@v1
     secrets:
       github-pat: ${{ secrets.PAT }}
 ```
@@ -67,4 +67,4 @@ jobs:
 ### Releasing
 
 The releasing is handled at git level with semantic versioning tags. Those are automatically generated and managed
-by the [git-tag-semver-from-label-workflow](https://github.com/infrastructure-blocks/git-tag-semver-from-label-workflow).
+by the [git-tag-semver-from-label-workflow](https://github.com/infra-blocks/git-tag-semver-from-label-workflow).
